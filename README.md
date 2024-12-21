@@ -42,3 +42,5 @@ Não há necessidade de instalação de ferramentas adicionais. Este projeto dep
   - [OrbitControls.js](https://threejs.org/examples/#misc_controls_orbit)
 
 Este projeto é uma demonstração básica das capacidades do Three.js, e pode ser expandido com novos modelos, texturas e interações.
+
+Link da apresentação do projeto: https://youtu.be/7suRICRdi4g
