@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Projeto - Three.js</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.158.0/examples/jsm/"
+      }
+    }
+  </script>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+    // Cena
+    const scene = new THREE.Scene();
+
+    // Definir o fundo preto
+    scene.background = new THREE.Color(0x000000); // Cor preta para o fundo
+
+    // Iluminação
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
+    scene.add(ambientLight);
+
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2);
+    directionalLight.position.set(5, 10, 5);
+    directionalLight.castShadow = true;
+    scene.add(directionalLight);
+
+    // Chão verde
+    const terrainMaterial = new THREE.MeshStandardMaterial({ color: 0x28a745 });
+    const terrainGeometry = new THREE.PlaneGeometry(100, 100, 10, 10);
+    const terrain = new THREE.Mesh(terrainGeometry, terrainMaterial);
+    terrain.rotation.x = -Math.PI / 2;
+    terrain.receiveShadow = true;
+    scene.add(terrain);
+
+    // Personagem principal
+    const playerGeometry = new THREE.BoxGeometry(1, 5, 1);
+    const playerMaterial = new THREE.MeshStandardMaterial({ color: 0x555555, metalness: 0.5, roughness: 0.7 });
+    const player = new THREE.Mesh(playerGeometry, playerMaterial);
+    player.position.set(0, 2.5, 0);
+    player.castShadow = true;
+    player.receiveShadow = true;
+    scene.add(player);
+
+    // Obstáculos
+    const obstacles = [];
+
+    function createObstacle(geometry, material, position) {
+      const obstacle = new THREE.Mesh(geometry, material);
+      obstacle.position.set(...position);
+      obstacle.castShadow = true;
+      obstacle.receiveShadow = true;
+      scene.add(obstacle);
+      obstacles.push(obstacle);
+    }
+
+    createObstacle(
+      new THREE.BoxGeometry(3, 3, 3),
+      new THREE.MeshStandardMaterial({ color: 0xff5733, metalness: 0.6, roughness: 0.5 }),
+      [10, 1.5, 5]
+    );
+
+    createObstacle(
+      new THREE.SphereGeometry(2, 32, 32),
+      new THREE.MeshStandardMaterial({ color: 0x00c3ff, metalness: 0.4, roughness: 0.6 }),
+      [-15, 2, -10]
+    );
+
+    createObstacle(
+      new THREE.CylinderGeometry(2, 2, 6, 32),
+      new THREE.MeshStandardMaterial({ color: 0x8e44ad, metalness: 0.8, roughness: 0.2 }),
+      [5, 3, -15]
+    );
+
+    // Função para gerar estrelas
+    function createStars(numStars) {
+      const starGeometry = new THREE.SphereGeometry(0.05, 4, 4); // Esfera pequena para simular uma estrela
+      const starMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff }); // Cor branca para as estrelas
+
+      for (let i = 0; i < numStars; i++) {
+        const star = new THREE.Mesh(starGeometry, starMaterial);
+
+        // Posiciona a estrela em um lugar aleatório no céu (em torno de um ponto alto)
+        const x = Math.random() * 200 - 100; // Coordenada X aleatória
+        const y = Math.random() * 200 - 100; // Coordenada Y aleatória
+        const z = Math.random() * 200 - 100; // Coordenada Z aleatória
+        star.position.set(x, y + 50, z); // Ajuste para que as estrelas fiquem mais altas (no céu)
+
+        scene.add(star);
+      }
+    }
+
+    // Gerar 1000 estrelas no "céu"
+    createStars(1000);
+
+    // Objetos Futuristas
+
+    // Discos Voadores
+    function createFlyingDisc(x, z) {
+      const discGeometry = new THREE.CylinderGeometry(5, 5, 1, 32);
+      const discMaterial = new THREE.MeshStandardMaterial({ color: 0x3498db, metalness: 0.9, roughness: 0.1, emissive: 0x1f77b4 });
+      const disc = new THREE.Mesh(discGeometry, discMaterial);
+      disc.rotation.x = Math.PI / 2;
+      disc.position.set(x, 5, z);
+      disc.castShadow = true;
+      disc.receiveShadow = true;
+      scene.add(disc);
+      obstacles.push(disc);  // Adiciona o disco como obstáculo
+    }
+
+    createFlyingDisc(15, 10);
+    createFlyingDisc(-10, -20);
+
+    // Estrutura futurista (torre)
+    function createFuturisticTower(x, z) {
+      const towerGeometry = new THREE.CylinderGeometry(2, 2, 15, 32);
+      const towerMaterial = new THREE.MeshStandardMaterial({ color: 0x8e44ad, metalness: 0.8, roughness: 0.2, emissive: 0x9b59b6 });
+      const tower = new THREE.Mesh(towerGeometry, towerMaterial);
+      tower.position.set(x, 7.5, z);
+      tower.castShadow = true;
+      tower.receiveShadow = true;
+      scene.add(tower);
+      obstacles.push(tower);  // Adiciona a torre como obstáculo
+    }
+
+    createFuturisticTower(30, 30);
+    createFuturisticTower(-30, -30);
+
+    // Nave espacial
+    function createSpaceship(x, z) {
+      const bodyGeometry = new THREE.CylinderGeometry(3, 1, 6, 32);
+      const bodyMaterial = new THREE.MeshStandardMaterial({ color: 0x2c3e50, metalness: 0.9, roughness: 0.1 });
+      const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+      body.position.set(x, 4, z);
+      body.rotation.x = Math.PI / 2;
+      body.castShadow = true;
+      body.receiveShadow = true;
+
+      scene.add(body);
+      obstacles.push(body);  // Adiciona a nave espacial como obstáculo
+    }
+
+    createSpaceship(-20, 20);
+
+    // Câmera
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 5, 15);
+
+    // Controles Orbitais
+    const controls = new OrbitControls(camera, document.body);
+    controls.enableDamping = true;
+    controls.minDistance = 5;
+    controls.maxDistance = 50;
+    controls.maxPolarAngle = Math.PI / 2.2;
+    controls.minPolarAngle = 0.3;
+
+    // Variáveis para alternar entre a câmera em primeira pessoa e terceira pessoa
+    let isFirstPerson = false;
+
+    function switchCameraView() {
+      if (isFirstPerson) {
+        // Voltar para terceira pessoa
+        camera.position.set(0, 5, 15);  // Posição na terceira pessoa
+        controls.target.set(0, 2.5, 0); // A câmera segue o jogador
+        controls.update();
+      } else {
+        // Mudar para primeira pessoa
+        camera.position.set(0, 2.5, 5);  // Posição na primeira pessoa
+        controls.target.set(0, 2.5, 0);  // A câmera foca no personagem
+        controls.update();
+      }
+      isFirstPerson = !isFirstPerson;
+    }
+
+    // Tecla 'P' para alternar 
+    document.addEventListener('keydown', (event) => {
+      if (event.key.toLowerCase() === 'p') {
+        switchCameraView();
+      }
+    });
+
+    // Movimentação do Personagem
+    const keys = { w: false, a: false, s: false, d: false };
+
+    document.addEventListener('keydown', (event) => {
+      keys[event.key.toLowerCase()] = true;
+    });
+
+    document.addEventListener('keyup', (event) => {
+      keys[event.key.toLowerCase()] = false;
+    });
+
+    const speed = 0.1;
+
+    function movePlayer() {
+      const direction = new THREE.Vector3();
+      camera.getWorldDirection(direction);
+      direction.y = 0;
+      direction.normalize();
+
+      const newPosition = player.position.clone();
+
+      if (keys.w) newPosition.addScaledVector(direction, speed);
+      if (keys.s) newPosition.addScaledVector(direction, -speed);
+
+      const right = new THREE.Vector3(direction.z, 0, -direction.x);
+      if (keys.a) newPosition.addScaledVector(right, speed);
+      if (keys.d) newPosition.addScaledVector(right, -speed);
+
+      // Impedir que o personagem atravesse o chão
+      if (newPosition.y < 2.5) { // 2.5 é a altura do personagem
+        newPosition.y = 2.5; // Ajusta a posição Y para não atravessar o chão
+      }
+
+      if (!detectCollision(newPosition)) {
+        player.position.copy(newPosition);
+      }
+    }
+
+    // Detecção de colisão
+    function detectCollision(newPosition) {
+      const playerBox = new THREE.Box3().setFromObject(player);
+      playerBox.translate(newPosition.clone().sub(player.position));
+
+      for (const obstacle of obstacles) {
+        const obstacleBox = new THREE.Box3().setFromObject(obstacle);
+
+        if (playerBox.intersectsBox(obstacleBox)) {
+          console.log('Colisão detectada com:', obstacle);
+          return true;
+        }
+      }
+
+      return false;
+    }
+
+    // Renderizador
+    const renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.shadowMap.enabled = true;
+    document.body.appendChild(renderer.domElement);
+
+    // Redimensionamento da tela
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // Função para mover objetos específicos
+    function moveSpecificObjects() {
+      // Mover o disco voador
+      obstacles.forEach(obstacle => {
+        if (obstacle.geometry.type === "CylinderGeometry" && obstacle.position.x === 15 && obstacle.position.z === 10) {  // Disco voador 1
+          obstacle.position.x += Math.sin(Date.now() * 0.001) * 0.05;  // Movimento ao longo do eixo X
+          obstacle.position.z += Math.cos(Date.now() * 0.001) * 0.05;  // Movimento ao longo do eixo Z
+        } else if (obstacle.geometry.type === "CylinderGeometry" && obstacle.position.x === -10 && obstacle.position.z === -20) {  // Disco voador 2
+          obstacle.position.x -= Math.sin(Date.now() * 0.001) * 0.05;  // Movimento ao longo do eixo X
+          obstacle.position.z -= Math.cos(Date.now() * 0.001) * 0.05;  // Movimento ao longo do eixo Z
+        } else if (obstacle.geometry.type === "CylinderGeometry" && obstacle.position.x === -20 && obstacle.position.z === 20) {  // Nave espacial
+          obstacle.position.y += Math.sin(Date.now() * 0.002) * 0.05;  // Movimento ao longo do eixo Y
+        }
+      });
+    }
+
+    // Dentro da função de animação
+    function animate() {
+      requestAnimationFrame(animate);
+
+      movePlayer();
+      moveSpecificObjects(); // Chama a função de movimento dos objetos específicos
+
+      controls.update();
+      renderer.render(scene, camera);
+    }
+
+    animate();
+  </script>
+</body>
+
+</html>
