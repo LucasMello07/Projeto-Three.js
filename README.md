@@ -1,15 +1,15 @@
 # Projeto - Three.js
 
-Este projeto é uma demonstração de um ambiente 3D interativo utilizando a biblioteca **Three.js**. O cenário apresenta uma série de elementos, como um personagem principal, obstáculos, discos voadores, uma nave espacial e uma torre futurista, tudo renderizado em um ambiente 3D. O projeto também permite a troca entre as vistas em primeira e terceira pessoa e inclui movimentação do personagem, detecção de colisões e animação de objetos.
+Este projeto é uma demonstração de um ambiente 3D interativo utilizando a biblioteca **Three.js**. O cenário apresenta uma série de elementos, como um personagem principal, obstáculos, discos voadores, uma nave espacial e uma torre futurista, tudo renderizado em um ambiente 3D. O projeto também permite a troca entre as vistas em primeira e terceira pessoa e inclui, detecção de colisões e animação de objetos.
 
 ## Descrição
 
 O projeto utiliza a **Three.js**, uma poderosa biblioteca JavaScript para renderização 3D na web, para criar um cenário dinâmico e interativo. A cena inclui:
 
-- Um personagem principal, controlado pelo usuário com as teclas WASD.
+- Um personagem principal, controlado pelo usuário com as teclas W, A, S, e D.
 - Obstáculos em diversas formas geométricas, como cubos, esferas, cilindros e discos voadores.
 - Um fundo estrelado no espaço.
-- Animação de objetos, como discos voadores e uma nave espacial.
+- Animação de objetos.
 - Controles de câmera em terceira e primeira pessoa.
 
 ## Instruções para Execução
@@ -23,7 +23,6 @@ Não há necessidade de instalação de ferramentas adicionais. Este projeto dep
 1. Faça o download ou clone este repositório.
 2. Abra o arquivo `index.html` em seu navegador para visualizar o projeto em execução.
 
-Se você deseja hospedar este projeto localmente em um servidor, basta configurá-lo em um servidor HTTP simples e acessá-lo através de `http://localhost`.
 
 ### Controles do Jogo
 
